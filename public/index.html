@@ -1,0 +1,48 @@
+<!--
+  Created by jitender choudhary on 10/28/2016.
+ -->
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <base href="/">
+    <title>Fusion AUT</title>
+    <link rel="shortcut icon" href="libs/favicon.ico" />
+    <!-- CSS -->
+    <link rel="stylesheet" href="libs/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="libs/bootstrap-ui/versioned-docs/2.0.1/ui-bootstrap-2.0.1-csp.css">
+    <link rel="stylesheet" href="index.css">
+    <!-- JS -->
+    <script src="libs/jquery/dist/jquery.min.js"></script>
+    <script src="libs/angular/angular.min.js"></script>
+    <script src="libs/angular-route/angular-route.min.js"></script>
+    <script src="libs/angular-animate/angular-animate.min.js"></script>
+    <script src="libs/angular-ui-router/release/angular-ui-router.min.js"></script>
+    <script src="libs/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="libs/ui-bootstrap-tpls-2.1.4.min.js"></script>
+    <script src="libs/angularjs-dropdown-multiselect.js"></script>
+    <script src="libs/lodash.js"></script>
+    <!-- ANGULAR CUSTOM -->
+    <script src="history/HistCtrl.js"></script>
+    <script src="home/MainCtrl.js"></script>
+    <script src="routes/appRoutes.js"></script>
+    <script src="routes/app.js"></script>
+</head>
+<body ng-app="fusionApp">
+    <div class="wrapper container" style="width:80%">
+        <!-- HEADER -->
+        <nav class="navbar navbar-inverse" style="background-color:#5d6a86">
+            <a class="navbar-brand" href="/" style="color:aliceblue">
+                <span style="color:aliceblue;margin-top:-1px" class="glyphicon glyphicon-home"></span> Fusion AUT Server
+            </a>
+            <ul class="navbar-brand" >
+                <span><a style="color:aliceblue;text-decoration : none" href="/history" ng-init="getTransactionList('Running')">History</a></span>
+            </ul>
+            <ul class="navbar-brand navbar-right ">
+                <div><a style="color:aliceblue;text-decoration : none" href="/about">About  &nbsp;</a></div>
+            </ul>
+        </nav>
+        <div ng-view></div>
+    </div>
+</body>
+</html>

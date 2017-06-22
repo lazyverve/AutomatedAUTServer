@@ -1,0 +1,28 @@
+<!--
+  Created by jitender choudhary on 10/28/2016.
+ -->
+<div class="row" style="margin-right: -2px;margin-left: -1px; border: solid 1px black;border-radius: 4px;">
+    <ul class="nav nav-tabs" style="background-color:#5d6a86">
+        <li><a data-toggle="tab" id="activeTab" href="#active" ng-click="getTransactionList('Running')" style="color:white">Active Requests</a></li>
+        <li><a data-toggle="tab" id="queuedTab" href="#queued" ng-click="getTransactionList('Queued')" style="color:white">Queued</a></li>
+        <li><a data-toggle="tab" id="archivedTab" href="#archived" ng-click="getTransactionList('Archived')" style="color:white">Archived</a></li>
+    </ul>
+   <div class="tab-content" id="tabs">
+        <div id="active" class="tab-pane fade in active" >
+            <div class="panel-body">
+                <history-list tab="running" data="transactionList.running"></history-list>
+            </div>
+        </div>
+        <div id="queued" class="tab-pane fade">
+            <div class="panel-body">
+               <history-list tab="queued" data="transactionList.queued"></history-list>
+            </div>
+
+        </div>
+        <div id="archived" class="tab-pane fade" >
+            <div class="panel-body">
+                <history-list tab="archived" data="transactionList.archived"></history-list>
+            </div>
+        </div>
+    </div>
+</div>

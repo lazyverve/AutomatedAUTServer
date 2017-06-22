@@ -1,0 +1,75 @@
+<!--
+  Created by jitender choudhary on 10/28/2016.
+ -->
+<form>
+    <div class="form-group">
+        <div class="input-group">
+            <div class="input-group-addon"><em class="glyphicon glyphicon-search"></em></div>
+            <input type="text" class="form-control" placeholder="Search Requests.." ng-model="search">
+        </div>
+    </div>
+</form>
+<div>
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <td ng-show="!(currentTab=='queued')">
+                    <a style="cursor: pointer" ng-click="sortType = 'name'; sortReverse = !sortReverse">
+                        Request Name
+                        <span ng-show="sortType == 'name' && !sortReverse" class="glyphicon glyphicon-triangle-bottom"></span>
+                        <span ng-show="sortType == 'name' && sortReverse" class="glyphicon glyphicon-triangle-top"></span>
+                    </a>
+                </td>
+                <td ng-show="currentTab=='queued'">
+                    <a style="cursor: pointer" ng-click="sortType = 'name'; sortReverse = !sortReverse">
+                        Request Name
+                        <span ng-show="sortType == 'name' && !sortReverse" class="glyphicon glyphicon-triangle-bottom"></span>
+                        <span ng-show="sortType == 'name' && sortReverse" class="glyphicon glyphicon-triangle-top"></span>
+                    </a>
+                </td>
+                <td>
+                    <a style="cursor: pointer" ng-click="sortType = 'submittedBy'; sortReverse = !sortReverse">
+                        Request Owner
+                        <span ng-show="sortType == 'submittedBy' && !sortReverse" class="glyphicon glyphicon-triangle-bottom"></span>
+                        <span ng-show="sortType == 'submittedBy' && sortReverse" class="glyphicon glyphicon-triangle-top"></span>
+                    </a>
+                </td>
+                <td ng-hide="currentTab=='archived'" style="color:#337ab7">Submitted Time</td>
+                <td ng-hide="currentTab=='queued'">
+                    <a style="cursor: pointer" ng-click="sortType = 'starttime'; sortReverse = !sortReverse">
+                        Start Time
+                        <span ng-show="sortType == 'starttime' && !sortReverse" class="glyphicon glyphicon-triangle-bottom"></span>
+                        <span ng-show="sortType == 'starttime' && sortReverse" class="glyphicon glyphicon-triangle-top"></span>
+                    </a>
+                </td>
+                <td ng-show="currentTab=='archived'">
+                    <a style="cursor: pointer" ng-click="sortType = 'archived'; sortReverse = !sortReverse">
+                        Finish Time
+                        <span ng-show="sortType == 'archived' && !sortReverse" class="glyphicon glyphicon-triangle-bottom"></span>
+                        <span ng-show="sortType == 'archived' && sortReverse" class="glyphicon glyphicon-triangle-top"></span>
+                    </a>
+                </td>
+                <td ng-show="currentTab=='archived'" style="color:#337ab7">Total Time</td>
+                <td ng-show="currentTab=='archived'" style="color:#337ab7">Validation Status</td>
+
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="transaction in transactionList  | orderBy:sortType:sortReverse | filter:search">
+                <td ng-show="!(currentTab=='queued')"><a href="/history/progress" ng-click="updateHistTrans(transaction)">{{ transaction.name }}</a></td>
+                <td ng-show="currentTab=='queued'"><a>{{ transaction.name }}</a></td>
+                <td>{{ transaction.submittedBy }}</td>
+                <td ng-hide="currentTab=='archived'">{{ transaction.submittedtime | date: 'medium' }}</td>
+                <td ng-hide="currentTab=='queued'">{{ transaction.starttime | date: 'medium' }}</td>
+                <td ng-show="currentTab=='archived'">{{ transaction.endtime | date: 'medium' }}</td>
+                <td ng-show="currentTab=='archived'">{{ transaction.totalTimeSpend }}</td>
+                <td style="vertical-align: middle;" ng-show="currentTab=='archived' && (transaction.premergeOutput=='' || !transaction.premergeOutput)"><span class="label label-default">Request Didn't Validated</span></td>
+                <td style="vertical-align: middle;" ng-show="currentTab=='archived' && transaction.premergeOutput=='Successful'"><a ng-href="{{transaction.transactionDetailedLocation}}" target="_blank" ><span class="label label-success">{{ transaction.premergeOutput }}</span></a></td>
+                <td style="vertical-align: middle;" ng-show="currentTab=='archived' && transaction.premergeOutput=='Failed'"><a ng-href="{{transaction.transactionDetailedLocation}}" target="_blank" ><span class="label label-danger">{{ transaction.premergeOutput }}</span></a></td>
+                <td style="vertical-align: middle;" ng-show="currentTab=='archived' && transaction.premergeOutput=='Warning'"><a ng-href="{{transaction.transactionDetailedLocation}}" target="_blank" ><span class="label label-warning">{{ transaction.premergeOutput }}</span></a></td>
+                <td style="vertical-align: middle;" ng-show="currentTab=='archived' && transaction.premergeOutput=='Request Does Not exist'"><span class="label label-info">{{ transaction.premergeOutput }}</span></td>
+                <td style="vertical-align: middle;" ng-show="currentTab=='archived' && transaction.premergeOutput=='Aborted'"><a ng-href="{{transaction.transactionDetailedLocation}}" target="_blank" ><span class="label label-info">{{ transaction.premergeOutput }}</span></a></td>
+            </tr>
+        </tbody>
+    </table>
+</div>

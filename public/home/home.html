@@ -1,0 +1,75 @@
+<!--
+  Created by jitender choudhary on 10/28/2016.
+ -->
+
+<div class="jumbotron text-center ">
+    <div class="row" style="margin-left: -58px; margin-right: -58px; margin-top: -58px; margin-bottom: -68px">
+        <div class="panel panel-primary">
+            <div class="panel-heading" style="background-color: #5d6a86">
+                <h4>Request Details</h4>
+            </div>
+            <div class="panel-body " style="padding-top: 30px">
+                <form ng-submit="submitTransaction()" id="transactionSubmitform" name="transactionSubmitform" class="form-horizontal " role="form">
+                    <div class="form-group">
+                        <label for="transaction-name" class="col-sm-2 col-md-2 control-label">ADE Label</label>
+                        <div class="col-sm-10 col-md-10 ">
+                            <input type="text" id="transactionname" class="form-control" name="transaction" ng-model="transaction.name" required placeholder="Enter ADE Label Name"
+                                required style="cursor: auto">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="transaction-email" class="col-sm-2 col-md-2 control-label">Email </label>
+                        <div class="col-sm-10 col-md-10">
+                            <input id="transaction-email" class="form-control" required type="email" ng-model="transaction.email" name="email" placeholder="abc@oracle.com">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="transaction-family" class="col-sm-2 col-md-2 control-label">Family</label>
+                        <div id="productFamilyDetails">
+                            <div class="btn-group" style="float: left;margin-left: 15px;">
+                                <select class="btn btn-default dropdown-toggle" name="familySelect" id="familySelectID" ng-options="option.name for option in transaction.family.availableOptions track by option.id"
+                                    ng-model="transaction.family.selectedOption"></select>
+                            </div>
+
+                            <div class="col-lg-6" style="float: right">
+                                <label for="dbstring1" class="col-sm-2 col-md-2 control-label">DB</label>
+                                <div class="input-group" id="dbstring1" style="width: 80%;float: right;">
+                                    <input type="text" style="border-radius: 4px" class="form-control" id="dbstring" name="dbstring" ng-model="transaction.dbString"
+                                        required placeholder="Something like.. username/password@slc09lwn.us.oracle.com:1522/jjikumar">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="breakonerror" class="col-sm-2 col-md-2 control-label">List of Projects</label>
+                        <div class="col-md-7 col-sm-7 col-lg-7" id="runJunits">
+                            <div class="input-group">
+                                <span >
+                                    <span ng-dropdown-multiselect="" options="projectList" selected-model="junitSelectedList" extra-settings="projectListConfigParams" checkboxes="true" translation-texts="projectListDisplayText"></span>
+                                </span>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="form-group">
+                            <div class="col-md-4 col-sm-4 col-lg-4 control-label text-right" style="margin-left: 300px">
+                                <input type="submit" class="btn btn-success btn-circle" id="btn-submit" value="Submit Request" ng-disabled="(transactionSubmitform.transaction.$dirty && transactionSubmitform.transaction.$invalid) ||
+                                    (transactionSubmitform.email.$dirty && transactionSubmitform.email.$invalid) || (transactionSubmitform.dbstring.$dirty && transactionSubmitform.dbstring.$invalid) ">
+                            </div>
+                        </div>
+                    </div>
+                     <div class="alert alert-success" ng-show='transactionSubmitform.$submitted && (transactionSubmitform.email.$dirty && transactionSubmitform.dbstring.$dirty && transactionSubmitform.transaction.$dirty)'>
+                        <strong>Request Submitted Successfully</strong> 
+                    </div>
+
+                    <div class="alert alert-danger" ng-show="errorMsg">
+                        <strong>{{errorMsg}}</strong>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
