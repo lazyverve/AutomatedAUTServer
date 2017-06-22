@@ -138,7 +138,7 @@ var getEmailBody = function(trans){
 	var validationRelativePathServer = trans.transactionDetailedLocation.substr(trans.transactionDetailedLocation.lastIndexOf('/'));
 	var validationSummaryFile = validationRelativePathServer.substr(0,validationRelativePathServer.length-2);
 	var emailBody ='"'+'AUT validation completed for your request ' + trans.name + 
-					'.\\nYou can verify the summary of the validation at ' + trans.transactionDetailedLocation+validationSummaryFile+'.txt'+
+					'.\\nYou can verify the summary of the validation at ' + trans.transactionDetailedLocation+validationSummaryFile+'test-report.html'+
 					'.\\nYou can verify the detailed result of the validation at ' + trans.transactionDetailedLocation+
 					'"';
 	return emailBody;
