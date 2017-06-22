@@ -138,7 +138,7 @@ var getEmailBody = function(trans){
 	var validationRelativePathServer = trans.transactionDetailedLocation.substr(trans.transactionDetailedLocation.lastIndexOf('/'));
 	var validationSummaryFile = validationRelativePathServer.substr(0,validationRelativePathServer.length-2);
 	var emailBody ='"'+'AUT validation completed for your request ' + trans.name + 
-					'.\\nYou can verify the summary of the validation at ' + trans.transactionDetailedLocation+validationSummaryFile+'test-report.html'+
+					'.\\nYou can verify the summary of the validation at ' + trans.transactionDetailedLocation+validationSummaryFile+'/test-report.html'+
 					'.\\nYou can verify the detailed result of the validation at ' + trans.transactionDetailedLocation+
 					'"';
 	return emailBody;
@@ -180,6 +180,10 @@ var processTransaction = function (transData) {
 			projectList += project+',';
 		}
 	}
+	if(projectList)
+	{
+		projectList = projectList.substr(0,projectList.length-1);
+	}
 
 	logger.info('projectList : ',projectList);
 
@@ -197,16 +201,14 @@ var processTransaction = function (transData) {
 	var emailSubject = getEmailSubject(trans);
 	var sendmailCommand = 'echo ' + emailBody + ' | mutt -s ' + emailSubject + ' -b ' + CC + ' ' + trans.email;
 	var premergeResultLocalLocation = __dirname + '\\..\\History\\Archived\\' + transName + '_1\\';
-	var preMergeResCopyCommandTest = 'scp -i ' + fuseConfig.sshPublicKeyLocation + ' -r ' + fuseConfig.adeServerUser + '@' + trans.adeServerUsed + ':' + premergeOutLoc + 'Test* ' + premergeResultLocalLocation;
-	var preMergeResCopyCommandtest = 'scp -i ' + fuseConfig.sshPublicKeyLocation + ' -r ' + fuseConfig.adeServerUser + '@' + trans.adeServerUsed + ':' + premergeOutLoc + 'test* ' + premergeResultLocalLocation;
-	
+	var preMergeResCopyCommandTest = 'scp -i ' + fuseConfig.sshPublicKeyLocation + ' -r ' + fuseConfig.adeServerUser + '@' + trans.adeServerUsed + ':' + premergeOutLoc + '[Tt]* ' + premergeResultLocalLocation;
+	fs.mkdirSync(premergeResultLocalLocation);
 	var permergeResultMainOutputFile = premergeResultLocalLocation + transName + '.txt';
 
 	logger.info('******************************************************************************************************************************************************');
 	logger.info('Email Body : ', emailBody);
 	logger.info('******************************************************************************************************************************************************');
 	logger.info('command to copy data : ', preMergeResCopyCommandTest);
-	logger.info('command to copy data : ', preMergeResCopyCommandtest);
 	logger.info('******************************************************************************************************************************************************');
 	logger.info('send mail command', sendmailCommand);
 	logger.info('******************************************************************************************************************************************************');
@@ -237,32 +239,6 @@ var processTransaction = function (transData) {
 	}).exec('echo', {
 		out: function (stdout) {
 			var copyFiles = exec(preMergeResCopyCommandTest, function (error, stdout, stderr) {
-				if (error) {
-					logger.error('Error occured while coping premerge result files : ', error);
-				}
-			});
-			logStream.write('AUT Process completed');
-			logger.info('AUT Process completed');
-			logStream.end();
-			var source = fs.createReadStream(fuseConfig.transactionActiveLogLocation + logFile);
-			var dest = fs.createWriteStream(fuseConfig.transactionArchivedLogLocation + logFile);
-			source.pipe(dest);
-			source.on('end', function () {
-				logger.info('AUT request logs moved to Archived');
-				fs.unlink(fuseConfig.transactionActiveLogLocation + logFile);
-				dest.end();
-			});
-			source.on('error', function (err) {
-				logger.error('failed to move AUT request logs to Archived', err);
-			});
-		},
-		err: function (stderr) {
-			logger.info(stderr);
-			return false;
-		}
-	}).exec('echo', {
-		out: function (stdout) {
-			var copyFiles = exec(preMergeResCopyCommandtest, function (error, stdout, stderr) {
 				if (error) {
 					logger.error('Error occured while coping premerge result files : ', error);
 				}
