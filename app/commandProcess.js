@@ -192,7 +192,7 @@ var processTransaction = function (transData) {
 
 	var createResultDir = finScriptParams + ' && mkdir  jitu && cp [Tt]* jitu ';
 	var endDelimeter = ' \"';
-	var exeCommand = finScriptParams + endDelimeter;
+	var exeCommand = createResultDir + endDelimeter;
 	var detailedTransactionOutputLocation = 'http://slc04kxc.us.oracle.com:81/' + transName + '_1'
 	trans.transactionDetailedLocation = detailedTransactionOutputLocation;
 	var emailBody = getEmailBody(trans);

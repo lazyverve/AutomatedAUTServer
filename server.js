@@ -17,7 +17,7 @@ var fs = require('fs');
 var fuseConfig = require('./config/configuration');
 var logger = require('./app/LoggingConfig');
 var logStream = fs.createWriteStream('log.txt', {'flags': 'a'});
-var fuseionAppPort = process.env.PORT || 80;
+var fuseionAppPort = process.env.PORT || 85;
 var dirListAppPort = 81;
 mongoose.Promise = global.Promise;
 mongoose.connect(fuseConfig.dburl);
