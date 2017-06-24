@@ -11,6 +11,7 @@ angular.module('MainCtrl', []).controller('MainController', function ($rootScope
         runJunits: 'Y',
         applyFPR: 'N',
         allowDBOverride: 'Y',
+        dbString : 'fusion/fusion@slc09xht.us.oracle.com:1559/jikumar',
         errorMsg:
         {
             transactionError: '',

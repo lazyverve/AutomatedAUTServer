@@ -135,10 +135,8 @@ var updateErroredTransation = function (trans, logStream, logFile) {
 };
 
 var getEmailBody = function(trans){
-	var validationRelativePathServer = trans.transactionDetailedLocation.substr(trans.transactionDetailedLocation.lastIndexOf('/'));
-	var validationSummaryFile = validationRelativePathServer.substr(0,validationRelativePathServer.length-2);
 	var emailBody ='"'+'AUT validation completed for your request ' + trans.name + 
-					'.\\nYou can verify the summary of the validation at ' + trans.transactionDetailedLocation+validationSummaryFile+'/test-report.html'+
+					'.\\nYou can verify the summary of the validation at ' + trans.transactionDetailedLocation+'/test-report.html'+
 					'.\\nYou can verify the detailed result of the validation at ' + trans.transactionDetailedLocation+
 					'"';
 	return emailBody;
@@ -192,16 +190,16 @@ var processTransaction = function (transData) {
 	var finScriptParams = useViewCommand + ' \" cd prc && ant -f build-po.xml -Dtest.lrg=true test test-report -Dlrg=prc_po_lrg -Dtest.project=\''+projectList+'\' -Ddb.host='+hostName+' -Ddb.port='+hostPort
 									+ ' -Ddb.sid='+hostSID + ' -Ddb.user='+userName + ' -Ddb.pass='+userPass;
 
-
+	var createResultDir = finScriptParams + ' && mkdir  jitu && cp [Tt]* jitu ';
 	var endDelimeter = ' \"';
 	var exeCommand = finScriptParams + endDelimeter;
-	var detailedTransactionOutputLocation = 'http://slc12ckt.us.oracle.com:81/' + transName + '_1'
+	var detailedTransactionOutputLocation = 'http://slc04kxc.us.oracle.com:81/' + transName + '_1'
 	trans.transactionDetailedLocation = detailedTransactionOutputLocation;
 	var emailBody = getEmailBody(trans);
 	var emailSubject = getEmailSubject(trans);
 	var sendmailCommand = 'echo ' + emailBody + ' | mutt -s ' + emailSubject + ' -b ' + CC + ' ' + trans.email;
 	var premergeResultLocalLocation = __dirname + '\\..\\History\\Archived\\' + transName + '_1\\';
-	var preMergeResCopyCommandTest = 'scp -i ' + fuseConfig.sshPublicKeyLocation + ' -r ' + fuseConfig.adeServerUser + '@' + trans.adeServerUsed + ':' + premergeOutLoc + '[Tt]* ' + premergeResultLocalLocation;
+	var preMergeResCopyCommandTest = 'scp -i ' + fuseConfig.sshPublicKeyLocation + ' -r ' + fuseConfig.adeServerUser + '@' + trans.adeServerUsed + ':' + premergeOutLoc + 'jitu/ ' + premergeResultLocalLocation;
 	fs.mkdirSync(premergeResultLocalLocation);
 	var permergeResultMainOutputFile = premergeResultLocalLocation + transName + '.txt';
 
