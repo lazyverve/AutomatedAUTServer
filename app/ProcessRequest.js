@@ -93,20 +93,10 @@ var processSubmitRequest = function (transactionString) {
     }
     logger.info('transaction.runJunits : ', transaction.runJunits);
     logger.info('transaction.allowDBOverride : ', transaction.allowDBOverride);
-    //always for AUT
-    transaction.runJunits = 'Y';
-    if (transaction.runJunits === 'Y') {
-        if (transaction.allowDBOverride === 'N') {
-            processTimeout = setInterval(checkParticularDBAvaliablityandProcess, 1000 * 30, transaction);
-        }
-        else {
-            processTimeout = setInterval(checkAnyDBAvaliablityandProcess, 1000 * 30, transaction);
-        }
-    }
-    else {
+
         transaction.DBServerUsed = transaction.dbString;
         serveRequest(transaction);
-    }
+    
 };
 
 processSubmitRequest(process.argv[2]);
