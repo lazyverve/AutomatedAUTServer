@@ -134,16 +134,16 @@ var updateErroredTransation = function (trans, logStream, logFile) {
 	}).start();
 };
 
-var getEmailBody = function(trans){
-	var emailBody ='"'+'AUT validation completed for your request ' + trans.name + 
-					'.\\nYou can verify the summary of the validation at ' + trans.transactionDetailedLocation+'/test-report.html'+
-					'.\\nYou can verify the detailed result of the validation at ' + trans.transactionDetailedLocation+
-					'"';
+var getEmailBody = function (trans) {
+	var emailBody = '"' + 'AUT validation completed for your request ' + trans.name +
+		'.\\nYou can verify the summary of the validation at ' + trans.transactionDetailedLocation + '/test-report.html' +
+		'.\\nYou can verify the detailed result of the validation at ' + trans.transactionDetailedLocation +
+		'"';
 	return emailBody;
 }
 
-var getEmailSubject = function(trans){
-	var mailSubject = '"FusionPrcCloud-AUT Validation Complete for your request '+ trans.name +'"';
+var getEmailSubject = function (trans) {
+	var mailSubject = '"FusionPrcCloud-AUT Validation Complete for your request ' + trans.name + '"';
 	return mailSubject;
 }
 
@@ -163,43 +163,42 @@ var processTransaction = function (transData) {
 	var premergeOutLoc = '/scratch/views/' + viewName + '/fusionapps/prc/';
 	updateTransactionStatus(trans, 'Running', fuseConfig.transactionActiveLogLocation + logFile, "");
 	var str = trans.dbString;
-    var userName = str.substring(0, str.indexOf('/'));
-    var userPass = str.substring(userName.length+1,str.indexOf('@'))
-    var hostName = str.substring(str.indexOf('@')+1, str.indexOf(':'));
-    var hostPort = str.substring(str.indexOf(':')+1, str.lastIndexOf('/'));
-    var hostSID =  str.substring(str.lastIndexOf('/')+1);
-	logger.info('Database Details Parsed : ',str,userName,userPass,hostName,hostName,hostPort,hostSID);
-	
-	var projectList = '' ;
+	var userName = str.substring(0, str.indexOf('/'));
+	var userPass = str.substring(userName.length + 1, str.indexOf('@'))
+	var hostName = str.substring(str.indexOf('@') + 1, str.indexOf(':'));
+	var hostPort = str.substring(str.indexOf(':') + 1, str.lastIndexOf('/'));
+	var hostSID = str.substring(str.lastIndexOf('/') + 1);
+	logger.info('Database Details Parsed : ', str, userName, userPass, hostName, hostName, hostPort, hostSID);
+
+	var projectList = '';
 	if (trans.junitSelectedList) {
-		for (var i in trans.junitSelectedList) {	
-			var project  =  trans.junitSelectedList[i].id ;
-			project = project.substring(project.lastIndexOf('/')+1);
-			projectList += project+',';
+		for (var i in trans.junitSelectedList) {
+			var project = trans.junitSelectedList[i].id;
+			project = project.substring(project.lastIndexOf('/') + 1);
+			projectList += project + ',';
 		}
 	}
-	if(projectList)
-	{
-		projectList = projectList.substr(0,projectList.length-1);
+	if (projectList) {
+		projectList = projectList.substr(0, projectList.length - 1);
 	}
 
-	logger.info('projectList : ',projectList);
+	logger.info('projectList : ', projectList);
 
-	var createViewCommand = 'ade createview ' + viewName + ' -label ' + series ;
+	var createViewCommand = 'ade createview ' + viewName + ' -label ' + series;
 	var useViewCommand = 'ade useview -silent ' + viewName + ' -exec ';
-	var finScriptParams = useViewCommand + ' \" cd prc && ant -f build-po.xml -Dtest.lrg=true test test-report -Dlrg=prc_po_lrg -Dtest.project=\''+projectList+'\' -Ddb.host='+hostName+' -Ddb.port='+hostPort
-									+ ' -Ddb.sid='+hostSID + ' -Ddb.user='+userName + ' -Ddb.pass='+userPass;
+	var finScriptParams = useViewCommand + ' \" cd prc && ant -f build-po.xml -Dtest.lrg=true test test-report -Dlrg=prc_po_lrg -Dtest.project=\'' + projectList + '\' -Ddb.host=' + hostName + ' -Ddb.port=' + hostPort
+		+ ' -Ddb.sid=' + hostSID + ' -Ddb.user=' + userName + ' -Ddb.pass=' + userPass;
 
-	var createResultDir = finScriptParams + ' && mkdir  jitu && cp [Tt]* jitu ';
+	var changePermissionParam = finScriptParams + ' && chmod 777 [Tt]*  ';
 	var endDelimeter = ' \"';
-	var exeCommand = createResultDir + endDelimeter;
+	var exeCommand = changePermissionParam + endDelimeter;
 	var detailedTransactionOutputLocation = 'http://slc04kxc.us.oracle.com:81/' + transName + '_1'
 	trans.transactionDetailedLocation = detailedTransactionOutputLocation;
 	var emailBody = getEmailBody(trans);
 	var emailSubject = getEmailSubject(trans);
 	var sendmailCommand = 'echo ' + emailBody + ' | mutt -s ' + emailSubject + ' -b ' + CC + ' ' + trans.email;
 	var premergeResultLocalLocation = __dirname + '\\..\\History\\Archived\\' + transName + '_1\\';
-	var preMergeResCopyCommandTest = 'scp -i ' + fuseConfig.sshPublicKeyLocation + ' -r ' + fuseConfig.adeServerUser + '@' + trans.adeServerUsed + ':' + premergeOutLoc + 'jitu/ ' + premergeResultLocalLocation;
+	var preMergeResCopyCommandTest = 'scp -i ' + fuseConfig.sshPublicKeyLocation + ' -r ' + fuseConfig.adeServerUser + '@' + trans.adeServerUsed + ':' + premergeOutLoc + '[Tt]* ' + premergeResultLocalLocation;
 	fs.mkdirSync(premergeResultLocalLocation);
 	var permergeResultMainOutputFile = premergeResultLocalLocation + transName + '.txt';
 
@@ -265,6 +264,19 @@ var processTransaction = function (transData) {
 			logger.info("permergeResultMainOutputFile : " + permergeResultMainOutputFile);
 			setTimeout(function () {
 				updateTransactionStatus(trans, 'Archived', fuseConfig.transactionArchivedLogLocation + logFile, permergeResultMainOutputFile);
+				new SSH({
+					host: trans.adeServerUsed,
+					user: fuseConfig.adeServerUser,
+					pass: fuseConfig.adeServerPass
+				}).exec('yes n | ade destroyview -force ' + viewName, {
+					out: function (stdout) {
+						logger.info(stdout);
+					},
+					err: function (stderr) {
+						logger.info(stderr);
+						return false;
+					}
+				}).start();
 			}, 60000);
 		},
 		err: function (stderr) {
@@ -272,14 +284,6 @@ var processTransaction = function (transData) {
 			return false;
 		}
 	}).exec(sendmailCommand, {
-		out: function (stdout) {
-			logger.info(stdout);
-		},
-		err: function (stderr) {
-			logger.info(stderr);
-			return false;
-		}
-	}).exec('yes n | ade destroyview -force ' + viewName, {
 		out: function (stdout) {
 			logger.info(stdout);
 		},
