@@ -171,11 +171,18 @@ var processTransaction = function (transData) {
 	logger.info('Database Details Parsed : ', str, userName, userPass, hostName, hostName, hostPort, hostSID);
 
 	var projectList = '';
+	var isEssJunitSelected = false;
 	if (trans.junitSelectedList) {
 		for (var i in trans.junitSelectedList) {
 			var project = trans.junitSelectedList[i].id;
 			project = project.substring(project.lastIndexOf('/') + 1);
-			projectList += project + ',';
+			if (project == 'PrcPoEssModelTest') {
+				isEssJunitSelected = true;
+				continue;
+			}
+			project = project.substring(5);  //Removing PrcPo from begning of prject name as it is already present in build-po.xml regex
+			project = project.substring(0, project.length - 4); //Removing Test from end of prject name as it is already present in build-po.xml regex
+			projectList += project + '|';
 		}
 	}
 	if (projectList) {
@@ -183,12 +190,17 @@ var processTransaction = function (transData) {
 	}
 
 	logger.info('projectList : ', projectList);
+	logger.info('PrcPoEssModelTest is selected to run  : ', isEssJunitSelected);
 
 	var createViewCommand = 'ade createview ' + viewName + ' -label ' + series;
-	var useViewCommand = 'ade useview -silent ' + viewName + ' -exec ';
-	var finScriptParams = useViewCommand + ' \" cd prc && ant -f build-po.xml -Dtest.lrg=true test test-report -Dlrg=prc_po_lrg -Dtest.project=\'' + projectList + '\' -Ddb.host=' + hostName + ' -Ddb.port=' + hostPort
-		+ ' -Ddb.sid=' + hostSID + ' -Ddb.user=' + userName + ' -Ddb.pass=' + userPass;
-
+	var useViewCommand = 'ade useview -silent ' + viewName + ' -exec \" cd prc && ade mkprivate build-po.xml && ';
+	if (!isEssJunitSelected) {
+		useViewCommand = useViewCommand + 'sed -i \'s#PrcPoEssModelTest##\' build-po.xml && ';
+	}
+	if (projectList) {
+		useViewCommand = useViewCommand + 'sed -i \'s#ApprovalService|ApprovedSupplierListModel|ApprovedSupplierListUiModel|EgpModelProcessingService|EssProtectedUiModel|CommonPoProtectedUiModel|CommonPoProtectedCoreModel|CommonPoProtectedModel|CommonPoWatchlistService|EditDocumentProtectedModel|EditDocumentProtectedUiModel|EditDocumentServicePurchaseAgreement|EditDocumentPurchaseRequestService|ManageDocumentProtectedModel|ManageDocumentPublicModel|ManageDocumentSupplierProtectedModel|ManageDocumentSupplierProtectedUiModel|EsignatureProtectedModel|ProcessDemandUiModel|PublicEntity|PublicView|SetupProtectedModel|ViewDocumentProtectedUiModel|SetupProtectedUiModel|ProcessDemandModel|PublicViewEcsf|ManageDocumentProtectedUiModel|SetupServiceMigrator|EditDocumentServicePurchaseOrder|ReqToPoAutomationService#' + projectList + '#\' build-po.xml &&';
+	}
+	var finScriptParams = useViewCommand + ' ant -f build-po.xml -Dtest.lrg=true test test-report -Dlrg=prc_po_lrg -Ddb.host=' + hostName + ' -Ddb.port=' + hostPort + ' -Ddb.sid=' + hostSID + ' -Ddb.user=' + userName + ' -Ddb.pass=' + userPass;
 	var changePermissionParam = finScriptParams + ' && chmod 777 [Tt]*  ';
 	var endDelimeter = ' \"';
 	var exeCommand = changePermissionParam + endDelimeter;
